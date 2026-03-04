@@ -392,22 +392,6 @@ python extract_predictions.py --config base.yaml --output results/predictions/
 
 ---
 
-## Reference Papers
-
-| Paper | Link |
-|-------|------|
-| Ilharco et al. — Task Arithmetic | https://arxiv.org/abs/2212.04089 |
-| Yadav et al. — TIES-Merging | https://arxiv.org/abs/2306.01708 |
-| Yu et al. — DARE | https://arxiv.org/abs/2311.03099 |
-| Bhardwaj et al. — DELLA | https://arxiv.org/abs/2406.11617 |
-| Yang et al. — AdaMerging | https://arxiv.org/abs/2310.02575 |
-| Wortsman et al. — Model Soups | https://arxiv.org/abs/2203.05482 |
-| Frankle et al. — Linear Mode Connectivity | https://arxiv.org/abs/1912.05671 |
-| Chen et al. — BEATs | https://arxiv.org/abs/2212.09058 |
-| Ghani et al. — BirdSet | https://arxiv.org/abs/2403.10380 |
-
----
-
 
 ## License
 
