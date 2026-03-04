@@ -1,4 +1,4 @@
-# Ecologically-Constrained Task Arithmetic for Bioacoustic Species Classification
+# Ecologically-Constrained Task Arithmetic for Multi-Taxa Bioacoustic Classifiers Without Shared Data
 
 Code for the paper:  
 **"Ecologically-Constrained Task Arithmetic for Multi-Taxa Bioacoustic Classifiers Without Shared Data"**  
