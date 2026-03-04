@@ -239,7 +239,6 @@ python create_regional_manifests.py --config base.yaml
 
 ### Phase 1 — Fine-tuning
 
-**Time:** ~6–8 GPU-hours per group (~50 GPU-hours total for all 7 groups)
 
 ```bash
 for GROUP in G1_passerines G2_nonpasserine_birds G3_raptors_waterbirds \
@@ -288,7 +287,6 @@ Training configuration (reproduced here for visibility — `base.yaml` is the au
 
 ### Phase 2 — Task Vectors and Core Experiments
 
-**Time:** ~3–4 GPU-hours
 
 ```bash
 # Compute task vectors: τ = encoder_state_dict(finetuned) − encoder_state_dict(pretrained)
@@ -323,8 +321,6 @@ python spectral_distance.py --config base.yaml --output results/analysis/
 
 ### Phase 3 — Regional and Domain Experiments
 
-**Time:** ~12 GPU-hours (includes additional fine-tuning for R1–R4)
-
 ```bash
 bash run_experiments_3_4.sh                  # Full pipeline
 bash run_experiments_3_4.sh --skip-finetune  # Skip if R1–R4 models already exist
@@ -340,8 +336,6 @@ bash run_experiments_3_4.sh --quick          # Reduced beta grid for testing
 
 ### Phase 4 — Figures
 
-**Time:** ~2 GPU-hours for full figure set
-
 ```bash
 # Static figures from JSON results (~2 min, CPU only)
 python visualize_results.py --config base.yaml --output figures/
@@ -354,7 +348,7 @@ python visualize_gpu.py --config base.yaml --output figures/
 bash run_visualizations.sh
 ```
 
-**Supplementary experiment figures** (optional, ~14 additional GPU-hours):
+**Supplementary experiment figures** (optional):
 ```bash
 python continual_learning.py --config base.yaml --output results/continual/
 python data_efficiency.py --config base.yaml --output results/data_efficiency/
