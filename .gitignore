@@ -13,3 +13,6 @@ results/
 wandb/
 
 results_summary.md
+
+*.pt
+*.pth
