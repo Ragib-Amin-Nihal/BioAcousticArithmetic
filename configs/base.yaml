@@ -1,0 +1,262 @@
+# configs/base.yaml
+# ============================================================================
+# Shared configuration for bioacoustic task arithmetic experiments.
+#
+# CRITICAL: All fine-tuning runs MUST use identical hyperparameters.
+# Changing any value in the `training` section between runs invalidates
+# task arithmetic results — heterogeneous training degrades merge quality.
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Project paths (relative to project root)
+# ---------------------------------------------------------------------------
+paths:
+  project_root: "."
+  # Raw downloads
+  data_raw: "data/raw"
+  # Processed 16kHz mono 5s clips
+  data_processed: "data/processed"
+  # JSON manifests per dataset
+  data_manifests: "data/manifests"
+  # Species group splits
+  species_groups: "data/species_groups"
+  # Model checkpoints
+  checkpoints: "checkpoints"
+  # BEATs base checkpoint — all task vectors are relative to this
+  beats_base_checkpoint: "checkpoints/BEATs_iter3_plus_AS2M_finetuned_on_AS2M_cpt2.pt"
+  # External repos
+  external: "external"
+  beats_repo: "external/unilm/beats"
+  aves_repo: "external/aves"
+  # Results
+  results: "results"
+  finetuned: "results/finetuned"
+  task_vectors: "results/task_vectors"
+  figures: "figures"
+
+# ---------------------------------------------------------------------------
+# Audio preprocessing
+# ---------------------------------------------------------------------------
+audio:
+  sample_rate: 16000
+  clip_duration_s: 5.0
+  # Number of non-overlapping clips to extract per file (0 = all possible)
+  max_clips_per_file: 0
+  # Files shorter than this (seconds) are discarded, not zero-padded
+  min_duration_s: 0.5
+  # Audio formats to accept
+  extensions: [".wav", ".mp3", ".ogg", ".flac", ".opus"]
+  # Energy filter: discard clips with RMS below this threshold (dB re full scale)
+  # -60 dB removes only near-digital-silence. Set to null to disable.
+  energy_threshold_db: -60.0
+
+# ---------------------------------------------------------------------------
+# Spectrogram (used by BEATs internally — documented here for reference)
+# ---------------------------------------------------------------------------
+spectrogram:
+  n_mels: 128
+  win_length_ms: 25
+  hop_length_ms: 10
+  # BEATs computes its own features; these are for any external mel usage
+
+# ---------------------------------------------------------------------------
+# Training hyperparameters — FIXED across ALL fine-tuning runs
+# ---------------------------------------------------------------------------
+training:
+  optimizer: "adamw"
+  learning_rate: 1.0e-5       # Conservative — stay near pretrained basin
+  weight_decay: 0.01
+  batch_size: 256
+  epochs: 20
+  freeze_epochs: 2             # Freeze encoder for first N epochs (warm up head)
+  warmup_steps: 500
+  lr_schedule: "onecycle"      # cosine with linear warmup
+  label_smoothing: 0.1
+  grad_clip: 1.0
+  patience: 5                  # Early stopping patience (epochs)
+  precision: "bf16"            # Mixed precision dtype
+  num_workers: 4
+  pin_memory: true
+  seed: 42
+
+# ---------------------------------------------------------------------------
+# Augmentation — also fixed across runs
+# ---------------------------------------------------------------------------
+augmentation:
+  spec_augment:
+    freq_mask_param: 20
+    time_mask_param: 50
+    n_freq_masks: 2
+    n_time_masks: 2
+  mixup_alpha: 0.3
+
+# ---------------------------------------------------------------------------
+# Dataset sources
+# ---------------------------------------------------------------------------
+datasets:
+  birdclef2023:
+    kaggle_competition: "birdclef-2023"
+    region: "R1_east_africa"
+    raw_dir: "data/raw/birdclef2023"
+    processed_dir: "data/processed/birdclef2023"
+    manifest: "data/manifests/birdclef2023.json"
+    description: "East Africa (Kenya/Tanzania), 264 bird species"
+
+  birdclef2024:
+    kaggle_competition: "birdclef-2024"
+    region: "R2_south_asia"
+    raw_dir: "data/raw/birdclef2024"
+    processed_dir: "data/processed/birdclef2024"
+    manifest: "data/manifests/birdclef2024.json"
+    description: "South Asia (India Western Ghats), 182 bird species"
+
+  birdclef2025:
+    kaggle_competition: "birdclef-2025"
+    region: "R3_neotropics"
+    raw_dir: "data/raw/birdclef2025"
+    processed_dir: "data/processed/birdclef2025"
+    manifest: "data/manifests/birdclef2025.json"
+    description: "Neotropics (Colombia), 206 birds + multi-taxa"
+
+  birdset_pow:
+    hf_dataset: "DBD-research-group/BirdSet"
+    hf_subset: "POW"
+    region: "R4_north_america"
+    raw_dir: "data/raw/birdset"
+    processed_dir: "data/processed/birdset_pow"
+    manifest: "data/manifests/birdset_pow.json"
+    description: "Powdermill Nature Reserve (Pennsylvania), 48 species"
+
+  watkins:
+    source: "whoi_scraper"
+    raw_dir: "data/raw/watkins"
+    processed_dir: "data/processed/watkins"
+    manifest: "data/manifests/watkins.json"
+    description: "Watkins Marine Mammal Sound Database, 60+ species"
+
+  anuraset:
+    zenodo_url: "https://zenodo.org/records/8342596/files"
+    raw_dir: "data/raw/anuraset"
+    processed_dir: "data/processed/anuraset"
+    manifest: "data/manifests/anuraset.json"
+    description: "Neotropical anuran soundscapes, 42 frog species"
+
+# ---------------------------------------------------------------------------
+# Species group definitions
+# ---------------------------------------------------------------------------
+species_groups:
+  # Groups G1-G3: Bird species partitioned by taxonomic order from
+  # the union of BirdCLEF 2023 + 2024 + 2025.
+  G1_passerines:
+    orders: ["Passeriformes"]
+    source_datasets: ["birdclef2023", "birdclef2024", "birdclef2025"]
+    description: "Songbirds (perching birds)"
+
+  G2_nonpasserine_birds:
+    # All bird orders NOT in G1 or G3
+    orders: ["Strigiformes", "Piciformes", "Columbiformes", "Cuculiformes",
+             "Caprimulgiformes", "Apodiformes", "Trogoniformes",
+             "Coraciiformes", "Bucerotiformes", "Galbuliformes",
+             "Psittaciformes", "Passeriformes_excluded"]
+    source_datasets: ["birdclef2023", "birdclef2024", "birdclef2025"]
+    description: "Non-passerine, non-raptor/waterbird species"
+
+  G3_raptors_waterbirds:
+    orders: ["Accipitriformes", "Falconiformes", "Charadriiformes",
+             "Anseriformes", "Pelecaniformes", "Suliformes",
+             "Ciconiiformes", "Gruiformes", "Podicipediformes",
+             "Phoenicopteriformes", "Procellariiformes"]
+    source_datasets: ["birdclef2023", "birdclef2024", "birdclef2025"]
+    description: "Raptors, shorebirds, waterbirds, waders"
+
+  G4_marine_mammals:
+    taxa_class: "Mammalia"
+    source_datasets: ["watkins"]
+    description: "Whales, dolphins, pinnipeds"
+
+  G5_amphibians:
+    taxa_class: "Amphibia"
+    source_datasets: ["anuraset", "birdclef2025"]
+    description: "Frogs and toads (Anura)"
+
+  G6_insects:
+    taxa_class: "Insecta"
+    source_datasets: ["birdclef2025"]
+    description: "Orthoptera, cicadas, other stridulating insects"
+
+  # Minimum viable groups — fall back to this if any group has <30 species
+  min_species_per_group: 15
+  # Species held out per group for zero-shot evaluation
+  holdout_species_per_group: 10
+
+# ---------------------------------------------------------------------------
+# Data splits
+# ---------------------------------------------------------------------------
+splits:
+  train_fraction: 0.70
+  val_fraction: 0.10
+  test_fraction: 0.20
+  # Minimum recordings per species to include (below this, species is dropped)
+  min_samples_per_species: 10
+  # Maximum recordings per species (cap to reduce class imbalance)
+  max_samples_per_species: 500
+  seed: 42
+
+# ---------------------------------------------------------------------------
+# Regional models
+# ---------------------------------------------------------------------------
+regions:
+  R1_east_africa:
+    datasets: ["birdclef2023"]
+    description: "East Africa — Kenya, Tanzania, Uganda"
+  R2_south_asia:
+    datasets: ["birdclef2024"]
+    description: "South Asia — India Western Ghats"
+  R3_neotropics:
+    datasets: ["birdclef2025"]
+    description: "Neotropics — Colombia Middle Magdalena Valley"
+  R4_north_america:
+    datasets: ["birdset_pow"]
+    description: "North America — Powdermill Nature Reserve, Pennsylvania"
+
+# ---------------------------------------------------------------------------
+# Merging methods to evaluate (used in Phase 2)
+# ---------------------------------------------------------------------------
+merging:
+  methods:
+    - name: "simple_average"
+    - name: "task_arithmetic"
+      lambda_grid: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    - name: "ties"
+      trim_fractions: [0.1, 0.2, 0.5, 0.8]
+    - name: "dare_average"
+      drop_rates: [0.5, 0.7, 0.9, 0.95, 0.99]
+    - name: "dare_ties"
+      drop_rates: [0.7, 0.9]
+      trim_fractions: [0.2]
+    - name: "della"
+    - name: "adamerging_task"
+    - name: "adamerging_layer"
+
+# ---------------------------------------------------------------------------
+# Evaluation
+# ---------------------------------------------------------------------------
+evaluation:
+  # Linear probing for merged encoder evaluation
+  linear_probe:
+    learning_rate: 1.0e-3
+    epochs: 10
+    batch_size: 64
+  # Bootstrap confidence intervals
+  bootstrap_n_resamples: 1000
+  bootstrap_confidence: 0.95
+  # LMC interpolation points
+  lmc_alphas: 11  # linspace(0, 1, 11)
+
+# ---------------------------------------------------------------------------
+# Experiment tracking
+# ---------------------------------------------------------------------------
+wandb:
+  project: "bioacoustic-task-arithmetic"
+  entity: null  # set to your wandb team/username
+  tags: ["phase0"]

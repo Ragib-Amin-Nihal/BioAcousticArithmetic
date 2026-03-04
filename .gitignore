@@ -1,0 +1,15 @@
+.venv/
+
+data/processed
+
+data/raw
+
+external/
+
+figures/
+
+results/
+
+wandb/
+
+results_summary.md

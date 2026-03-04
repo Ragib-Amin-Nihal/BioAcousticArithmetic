@@ -1,0 +1,9 @@
+{
+  "setup_date": "2026-02-16T19:16:58.181731",
+  "python_version": "3.9.18 (main, Jan 24 2024, 00:00:00) \n[GCC 11.4.1 20231218 (Red Hat 11.4.1-3)]",
+  "git_hash": "not a git repo",
+  "torch_version": "2.2.0+cu121",
+  "cuda_available": true,
+  "cuda_version": "12.1",
+  "gpu_name": "NVIDIA H100 MIG 4g.47gb"
+}
