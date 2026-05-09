@@ -2,7 +2,7 @@
 
 Code for the paper:  
 **"Ecologically-Constrained Task Arithmetic for Multi-Taxa Bioacoustic Classifiers Without Shared Data"**  
-*Submitted to Interspeech 2026*
+Paper link: https://arxiv.org/pdf/2605.03914
 
 ---
 
