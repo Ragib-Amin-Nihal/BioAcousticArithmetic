@@ -1,0 +1,9 @@
+@inproceedings{nihal2026ecological,
+  title     = {Ecologically-Constrained Task Arithmetic for Multi-Taxa
+               Bioacoustic Classifiers Without Shared Data},
+  author    = {Nihal, Ragib Amin and Yen, Benjamin and Shi, Runwu and
+               Ashizawa, Takeshi and Nakadai, Kazuhiro},
+  booktitle = {Proc. INTERSPEECH 2026},
+  year      = {2026},
+  address   = {Sydney, Australia}
+}

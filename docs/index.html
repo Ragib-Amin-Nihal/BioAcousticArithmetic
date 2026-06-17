@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ecologically-Constrained Task Arithmetic for Multi-Taxa Bioacoustic Classifiers</title>
+  <meta name="description" content="Independently fine-tuned BEATs encoders compose into a 661-species bioacoustic classifier via task-vector arithmetic — without sharing data. INTERSPEECH 2026.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Ecologically-Constrained Task Arithmetic for Multi-Taxa Bioacoustic Classifiers">
+  <meta property="og:description" content="Near-orthogonal task vectors let independently trained bioacoustic specialists merge into a 661-species classifier without shared data.">
+  <meta property="og:type" content="website">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Serif:wght@400;700&display=swap">
+  <link rel="stylesheet" href="static/css/index.css">
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav class="navbar is-white" role="navigation" aria-label="main navigation" style="border-bottom:1px solid #e4e8ea;">
+  <div class="navbar-brand">
+    <a class="navbar-item has-text-weight-bold" href="#top">🐦 BioAcoustic Arithmetic</a>
+    <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div id="navMenu" class="navbar-menu">
+    <div class="navbar-end">
+      <a class="navbar-item" href="#findings">Findings</a>
+      <a class="navbar-item" href="#method">Method</a>
+      <a class="navbar-item" href="#results">Results</a>
+      <a class="navbar-item" href="#negation">Boundary</a>
+      <a class="navbar-item" href="#bibtex">Cite</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header id="top" class="hero-banner">
+  <div class="container has-text-centered" style="max-width:1000px;">
+    <span class="venue-badge">INTERSPEECH 2026 · Sydney</span>
+    <h1 class="publication-title">Ecologically-Constrained Task Arithmetic for<br>
+      Multi-Taxa Bioacoustic Classifiers Without Shared Data</h1>
+
+    <p class="authors">
+      <span class="author-block"><a href="https://github.com/Ragib-Amin-Nihal">Ragib Amin Nihal</a><sup class="sup">1</sup>,</span>
+      <span class="author-block">Benjamin Yen<sup class="sup">1,2</sup>,</span>
+      <span class="author-block">Runwu Shi<sup class="sup">1</sup>,</span>
+      <span class="author-block">Takeshi Ashizawa<sup class="sup">1</sup>,</span>
+      <span class="author-block">Kazuhiro Nakadai<sup class="sup">1</sup></span>
+    </p>
+    <p class="affiliations">
+      <sup class="sup">1</sup> Systems and Control Engineering, Institute of Science Tokyo, Japan
+      &nbsp;·&nbsp; <sup class="sup">2</sup> RIKEN BDR, Japan
+    </p>
+
+    <div class="link-buttons">
+      <a class="button" href="interspeech_camera_ready.pdf">
+        <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper</span></a>
+      <a class="button" href="https://github.com/Ragib-Amin-Nihal/BioAcousticArithmetic">
+        <span class="icon"><i class="fab fa-github"></i></span><span>Code</span></a>
+      <a class="button" href="#bibtex">
+        <span class="icon"><i class="fas fa-quote-right"></i></span><span>BibTeX</span></a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= TL;DR ================= -->
+<section class="section" style="padding-top:2rem;">
+  <div class="content-narrow">
+    <div class="tldr">
+      <b>TL;DR —</b> Bioacoustic training data is scattered across taxa, regions, and
+      institutions, and often cannot be centralized. We show that independently
+      fine-tuned <b>BEATs</b> encoders can be composed into a unified
+      <b>661-species classifier</b> via <b>task-vector arithmetic</b> — sharing only
+      weights, never data. Bioacoustic task vectors turn out to be <b>near-orthogonal</b>
+      (cosine 0.01&nbsp;±&nbsp;0.09), a geometry that tracks <b>spectral distribution
+      distance</b> (the acoustic niche hypothesis). This makes <b>simple averaging
+      optimal</b>, makes sign-conflict methods like TIES <b>harmful</b>, and creates an
+      <b>asymmetric gap that benefits underrepresented taxa</b>.
+    </div>
+  </div>
+</section>
+
+<!-- ================= HERO ANIMATION ================= -->
+<section class="section" style="padding-top:0.5rem;">
+  <div class="container" style="max-width:1000px;">
+    <p class="section-kicker">The idea in one picture</p>
+    <h2 class="section-title">From acoustic niches to composable weights</h2>
+    <div class="figure-card" style="margin-top:1.2rem;">
+      <video autoplay loop muted playsinline controls style="width:100%;border-radius:10px;display:block;"
+             poster="static/videos/figure1_1080p.png">
+        <source src="static/videos/figure1_1080p.mp4" type="video/mp4">
+      </video>
+      <p class="figure-caption has-text-centered">
+        <b>(a)</b> Taxonomic groups concentrate vocal energy in non-overlapping frequency
+        bands. <b>(b)</b> Classifying them modifies largely disjoint parameter subsets, so
+        their task vectors are near-orthogonal (magnitude ∝ dataset size). <b>(c)</b>
+        Averaging the vectors and adding them to the shared pretrained encoder yields a
+        multi-taxa classifier — no joint training, no shared data.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABSTRACT ================= -->
+<section class="section alt">
+  <div class="content-narrow">
+    <h2 class="section-title">Abstract</h2>
+    <p style="margin-top:1rem;">
+      Training data for bioacoustics is scattered across taxa, regions, and institutions.
+      Centralizing it all is often infeasible. We show that independently fine-tuned BEATs
+      encoders can be composed into a unified 661-species classifier via task vector
+      arithmetic without sharing data. We find that bioacoustic task vectors are
+      near-orthogonal (cosine 0.01±0.09). Their separation aligns closely with spectral
+      distribution distance, a gradient consistent with the acoustic niche hypothesis.
+      This geometry makes simple averaging optimal while sign-conflict methods reduce
+      accuracy by one to six percentage points. Composition also creates an asymmetric
+      gap: species-rich groups lose accuracy relative to joint training while
+      underrepresented taxa gain, a redistribution useful for equitable biodiversity
+      monitoring. We verify linear mode connectivity across all taxonomic pairs,
+      demonstrate zero-shot transfer to new regions, and identify domain negation as a
+      boundary condition where composition fails. These results enable a collaborative
+      paradigm for bioacoustics where institutions share only task vectors to assemble
+      multi-taxa classifiers, preserving data privacy.
+    </p>
+  </div>
+</section>
+
+<!-- ================= KEY FINDINGS ================= -->
+<section id="findings" class="section">
+  <div class="container" style="max-width:1100px;">
+    <p class="section-kicker">Contributions</p>
+    <h2 class="section-title">Three key findings</h2>
+    <div class="columns is-variable is-5" style="margin-top:1rem;">
+      <div class="column">
+        <div class="finding-card">
+          <span class="tag-num">1</span>
+          <h4>Composition without shared data</h4>
+          <p>Five independently fine-tuned species-group models compose into a
+            <span class="stat">661-species</span> classifier at
+            <span class="stat">59.2%</span> accuracy — <span class="stat">86%</span> of a
+            jointly-trained baseline — and regional models reach
+            <span class="stat">91%</span> of dedicated performance.</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="finding-card">
+          <span class="tag-num">2</span>
+          <h4>Ecology predicts weight-space geometry</h4>
+          <p>Task vectors are near-orthogonal (cosine <span class="stat">0.01&nbsp;±&nbsp;0.09</span>),
+            rising from cross-taxa (0.01) to intra-avian (0.08) to regional (0.08) pairs.
+            This gradient correlates strongly with <span class="stat">spectral
+            distribution distance</span> — the acoustic niche hypothesis, in weights.</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="finding-card">
+          <span class="tag-num">3</span>
+          <h4>An asymmetric gap that helps minorities</h4>
+          <p>Merging redistributes capacity from majority to minority taxa: passerines
+            <span class="stat">−11.8%</span> while marine mammals
+            <span class="stat">+3.9%</span> and amphibians <span class="stat">+1.9%</span>
+            — useful for equitable biodiversity monitoring.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONCEPT ANIMATIONS ================= -->
+<section class="section alt">
+  <div class="container" style="max-width:1100px;">
+    <p class="section-kicker">Animated explainers</p>
+    <h2 class="section-title">The mechanism, in motion</h2>
+    <div class="columns is-variable is-5" style="margin-top:1.2rem;">
+      <div class="column">
+        <div class="video-wrap">
+          <video autoplay loop muted playsinline controls
+                 poster="static/videos/task_arithmetic_1080p.png">
+            <source src="static/videos/task_arithmetic_1080p.mp4" type="video/mp4">
+          </video>
+          <p class="figure-caption"><b>Task arithmetic in weight space.</b> A trained model
+            is a point; each specialist is a near-orthogonal arrow (cosine 0.01–0.09).
+            Because the arrows barely overlap, averaging them onto θ₀ preserves every
+            specialist's knowledge.</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="video-wrap">
+          <video autoplay loop muted playsinline controls
+                 poster="static/videos/asymmetric_gap.png">
+            <source src="static/videos/asymmetric_gap.mp4" type="video/mp4">
+          </video>
+          <p class="figure-caption"><b>The asymmetric gap.</b> Relative to joint training,
+            species-rich majority taxa lose accuracy while under-represented taxa gain —
+            a redistribution useful for equitable monitoring.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= METHOD ================= -->
+<section id="method" class="section">
+  <div class="container" style="max-width:1000px;">
+    <p class="section-kicker">Method</p>
+    <h2 class="section-title">Task vectors, and how to combine them</h2>
+    <div class="content-narrow">
+      <p>From a shared pretrained encoder θ₀ and a model fine-tuned on group <i>i</i>,
+        the <b>task vector</b> τᵢ = θᵢ − θ₀ captures what was learned (encoder weights
+        only — classification heads are discarded). The simplest composition averages them:</p>
+      <p class="eq">θ<sub>merged</sub> = θ₀ + (1/N) Σ<sub>i</sub> τ<sub>i</sub></p>
+      <p>Because the task vectors are pairwise near-orthogonal, no directional
+        interference occurs — performance loss depends only on vector
+        <i>magnitudes</i>, and the dominant term scales with ‖τᵢ‖². Groups trained on
+        larger datasets therefore experience greater dilution, which is exactly why the
+        composition gap is <b>asymmetric</b>. The same orthogonality drives sign agreement
+        toward 0.5, so TIES-style majority voting becomes random.</p>
+    </div>
+
+    <!-- Interactive: task vector arithmetic -->
+    <div class="columns is-variable is-5" style="margin-top:1.5rem;">
+      <div class="column is-7">
+        <div class="widget">
+          <h4>Build the merged encoder</h4>
+          <p class="sub">Each colored arrow is a specialist's task vector, scaled by 1/N
+            and added tip-to-tail onto the base model θ₀ (dashed = full-size τᵢ).</p>
+          <div id="tv-arith"></div>
+          <div class="controls">
+            <button id="tv-play" class="seg-btn active"><i class="fas fa-play"></i>&nbsp; Replay</button>
+          </div>
+        </div>
+      </div>
+      <div class="column is-5">
+        <div class="widget" style="height:100%;">
+          <h4>How orthogonal, really?</h4>
+          <p class="sub">Even the <i>most</i> similar pairs sit close to 90°. Slide across
+            the empirical gradient:</p>
+          <div id="cos-fan"></div>
+          <input id="cos-slider" type="range" min="0" max="2" step="1" value="0">
+          <p id="cos-readout" style="margin-top:.6rem;"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive: merging methods -->
+    <div class="widget" style="margin-top:1.5rem;">
+      <h4>Why simple averaging wins here</h4>
+      <p class="sub">Toggle a merging strategy and see what it does to the task-vector
+        parameters when the vectors are near-orthogonal.</p>
+      <div class="columns is-vcentered">
+        <div class="column is-7"><div id="merge-methods"></div></div>
+        <div class="column is-5">
+          <div class="controls" style="margin-bottom:.8rem;">
+            <button class="seg-btn active" data-method="simple">Simple average</button>
+            <button class="seg-btn" data-method="dare">DARE</button>
+            <button class="seg-btn danger" data-method="ties">TIES</button>
+          </div>
+          <p id="merge-readout"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<section id="results" class="section">
+  <div class="container" style="max-width:1100px;">
+    <p class="section-kicker">Experiments &amp; results</p>
+    <h2 class="section-title">What the weight space looks like</h2>
+
+    <!-- Exp 1: LMC -->
+    <div class="figure-card" style="margin-top:1.4rem;">
+      <h4 class="has-text-weight-bold" style="font-size:1.15rem;">Experiment 1 · Linear Mode Connectivity</h4>
+      <p class="figure-caption" style="margin:.3rem 0 1rem;">Every fine-tuned pair is
+        connected by a monotonic, <b>zero-barrier</b> interpolation path — the specialists
+        live in a shared loss basin, a prerequisite for merging to work.</p>
+      <img src="static/images/lmc_curves.png" alt="Linear mode connectivity curves for all taxonomic pairs, all monotonic with zero barriers.">
+    </div>
+
+    <!-- Exp 2 grid -->
+    <div class="columns is-variable is-5" style="margin-top:1.5rem;">
+      <div class="column is-6">
+        <div class="figure-card">
+          <img src="static/images/cosine_matrix.png" alt="Cosine similarity / sign agreement matrix across groups G1-G5.">
+          <p class="figure-caption"><b>Near-orthogonal task vectors.</b> Cosine
+            similarities (lower triangle) are 0.01–0.09; sign agreement (upper triangle)
+            hovers near 0.51 — near-random, which is why TIES discards ~half of each vector.</p>
+        </div>
+      </div>
+      <div class="column is-6">
+        <div class="figure-card">
+          <img src="static/images/spectral_vs_cosine.png" alt="Task-vector cosine similarity versus Jensen-Shannon spectral divergence.">
+          <p class="figure-caption"><b>Ecology predicts geometry.</b> Pairwise cosine
+            similarity falls as spectral distribution divergence grows — bird–bird pairs
+            cluster high-similarity, hydrophone-recorded marine mammals sit farthest.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-variable is-5">
+      <div class="column is-6">
+        <div class="figure-card">
+          <img src="static/images/composition.png" alt="Per-group composition accuracy across merging methods.">
+          <p class="figure-caption"><b>Species-group composition.</b> Direct averaging
+            matches or beats every conflict-resolution method; the unified probe spans all
+            661 species.</p>
+        </div>
+      </div>
+      <div class="column is-6">
+        <div class="figure-card">
+          <img src="static/images/asymmetric_gap.png" alt="Asymmetric composition gap: majority taxa lose, minority taxa gain.">
+          <p class="figure-caption"><b>The asymmetric gap.</b> Species-rich passerines
+            lose accuracy relative to joint training, while data-poor marine mammals and
+            amphibians gain.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-variable is-5">
+      <div class="column is-6">
+        <div class="figure-card">
+          <img src="static/images/weight_pca.png" alt="PCA of fine-tuned encoder weights showing modular structure.">
+          <p class="figure-caption"><b>Weight-space structure.</b> The first two principal
+            components of the task vectors capture 76.4% of variance and separate taxa.</p>
+        </div>
+      </div>
+      <div class="column is-6">
+        <div class="figure-card">
+          <img src="static/images/regional_cosine.png" alt="Regional task-vector cosine similarity matrix.">
+          <p class="figure-caption"><b>Experiment 3 · Regional composition.</b> Merging
+            geographically specialized models transfers to novel regions, reaching 91% of
+            dedicated per-region performance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BOUNDARY: DOMAIN NEGATION ================= -->
+<section id="negation" class="section alt">
+  <div class="container" style="max-width:1000px;">
+    <p class="section-kicker">Experiment 4 · A boundary condition</p>
+    <h2 class="section-title">Where composition fails: domain negation</h2>
+    <div class="columns is-vcentered is-variable is-5" style="margin-top:1rem;">
+      <div class="column is-6">
+        <div class="figure-card">
+          <img src="static/images/domain_negation.png" alt="Domain negation curves: subtracting the focal task vector degrades both focal and soundscape accuracy.">
+        </div>
+      </div>
+      <div class="column is-6">
+        <p>Task arithmetic also allows <i>subtraction</i>. We tried removing a
+          “focal-recording” task vector to improve soundscape performance:
+          θ<sub>new</sub> = θ<sub>source</sub> − β·τ<sub>focal</sub>. It <b>fails</b> —
+          both focal and soundscape accuracy degrade monotonically. The focal recording is
+          not a separable <i>style</i> but a canonical representation of species identity,
+          so subtracting it erases core information. A matched random-vector control moves
+          accuracy by only <span class="stat">±0.6%</span>, confirming the degradation is
+          direction-specific. Negation works only when the attribute is truly disentangled
+          from identity in weight space.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VISION CONTRAST ================= -->
+<section class="section">
+  <div class="container" style="max-width:1000px;">
+    <p class="section-kicker">Context</p>
+    <h2 class="section-title">A regime that distinguishes bioacoustics from vision</h2>
+    <div class="columns is-vcentered is-variable is-5" style="margin-top:1rem;">
+      <div class="column is-5">
+        <div class="figure-card">
+          <img src="static/images/vision_cosine.png" alt="Vision task-vector cosine distribution for comparison.">
+        </div>
+      </div>
+      <div class="column is-7">
+        <p>Acoustic niche partitioning pushes bioacoustic task vectors into a far more
+          orthogonal regime than is typical elsewhere. This is what makes simple averaging
+          the right tool here and conflict-resolution methods counterproductive — and it
+          suggests composition quality can be assessed <i>a priori</i> from acoustic
+          properties alone, before any merging is attempted.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHY IT MATTERS ================= -->
+<section class="section alt">
+  <div class="content-narrow has-text-centered">
+    <h2 class="section-title">Toward collaborative model building</h2>
+    <p style="margin-top:1rem;">As monitoring expands to diverse taxa and under-surveyed
+      regions, task-vector arithmetic offers the bioacoustics community a path toward
+      shared multi-taxa classifiers: contribute learned knowledge as a lightweight task
+      vector as ecological coverage grows — <b>without centralizing data or retraining</b>.</p>
+  </div>
+</section>
+
+<!-- ================= BIBTEX ================= -->
+<section id="bibtex" class="section">
+  <div class="content-narrow">
+    <div class="level is-mobile" style="margin-bottom:.6rem;">
+      <div class="level-left"><h2 class="section-title" style="margin:0;">BibTeX</h2></div>
+      <div class="level-right">
+        <button id="copy-bibtex" class="button is-small is-dark" style="border-radius:999px;">
+          <span class="icon"><i class="fas fa-copy"></i></span><span>Copy</span></button>
+      </div>
+    </div>
+<pre class="bibtex" id="bibtex">@inproceedings{nihal2026ecological,
+  title     = {Ecologically-Constrained Task Arithmetic for Multi-Taxa
+               Bioacoustic Classifiers Without Shared Data},
+  author    = {Nihal, Ragib Amin and Yen, Benjamin and Shi, Runwu and
+               Ashizawa, Takeshi and Nakadai, Kazuhiro},
+  booktitle = {Proc. INTERSPEECH 2026},
+  year      = {2026},
+  address   = {Sydney, Australia}
+}</pre>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="content-narrow has-text-centered">
+    <p><b>Acknowledgments.</b> Supported in part by JSPS KAKENHI Grant Number JP20H00475
+      and the TSUBAME4.0 supercomputer at Institute of Science Tokyo.</p>
+    <p style="margin-top:.8rem;">
+      <a href="interspeech_camera_ready.pdf">Paper</a> ·
+      <a href="https://github.com/Ragib-Amin-Nihal/BioAcousticArithmetic">Code</a>
+    </p>
+    <p style="margin-top:.8rem; font-size:.85rem;">
+      Page design adapted from the
+      <a href="https://github.com/eliahuhorwitz/Academic-project-page-template">Academic
+      Project Page Template</a>, itself based on
+      <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>
+      (<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>).
+    </p>
+  </div>
+</footer>
+
+<script src="static/js/index.js"></script>
+<script src="static/js/animations.js"></script>
+</body>
+</html>
